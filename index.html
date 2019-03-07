@@ -5,6 +5,197 @@
 	<title>动态时钟</title>
 </head>
 <body>
-	
+	<div class="wrapper">
+  	<canvas id="clock">
+  		<p>你的浏览器不支持Canvas</p>
+  	</canvas>
+  </div>	
+  <script src="./jquery.min.js"></script>
+  <script>
+  	$(
+		function() {
+		    clock();
+		    setInterval(clock, 1000);
+		}
+    );
+ 
+function clock() {
+    var canvas = document.getElementById("clock");
+    canvas.height = 500;
+    canvas.width = 500;
+    var context = canvas.getContext("2d");
+    
+    //绘制外围两个圈
+    context.beginPath();
+    context.strokeStyle = "rgb(255,21,21)";
+    context.lineWidth = 15;
+    context.arc(250, 250, 200, (Math.PI / 180) * 0, (Math.PI / 180) * 360, false);
+    context.stroke();
+    context.restore();
+
+    context.save();
+    context.beginPath();
+    context.strokeStyle = "rgb(183,13,13)";
+    context.lineWidth = 8;
+    context.arc(250, 250, 190, (Math.PI / 180) * 0, (Math.PI / 180) * 360, false);
+    context.stroke();
+    context.restore();
+
+    
+    //绘制数字
+    context.save(); //存储当前画布坐标系状态
+    context.beginPath();
+    context.font = "16px Tahoma";
+    context.strokeStyle = "#000";
+    context.textAlign="center";
+    context.textBaseline="midden";
+    // context.translate(250, 250); //将坐标系坐标原点移至图中间
+    for (var i = 1; i < 13; i++) {
+        // context.fillText((i + 3) % 12 == 0 ? 12 : (i + 3) % 12, 140, 0);
+        // context.rotate((Math.PI / 6));
+        hous(250,250,140,i,context);
+    }
+    context.restore();
+
+    //封装数字函数
+    function hous(x,y,r,h,context){
+			
+			var gen3=Math.sqrt(3);
+			var rs=0.5*r;
+            switch(h)
+			{
+			case 1:
+              context.fillText("1",x+rs,y-rs*gen3);
+			  break;
+			case 2:
+			  context.fillText("2",x+gen3*rs,y-rs);
+			  break;
+			case 3:
+			  context.fillText("3",x+2*rs,y);
+			  break;
+			case 4:
+			  context.fillText("4",x+gen3*rs,y+rs);
+			  break;
+			case 5:
+			  context.fillText("5",x+rs,y+gen3*rs);
+			  break;
+			case 6:
+			  context.fillText("6",x,y+2*rs);
+			  break;
+			case 7:
+			  context.fillText("7",x-rs,y+gen3*rs);
+			  break;
+			case 8:
+			  context.fillText("8",x-gen3*rs,y+rs);
+			  break;
+			case 9:
+			  context.fillText("9",x-2*rs,y);
+			  break;
+			case 10:
+			  context.fillText("10",x-gen3*rs,y-rs);
+			  break;
+			case 11:
+			  context.fillText("11",x-rs,y-gen3*rs);
+			  break;
+			case 12:
+			  context.fillText("12",x,y-2*rs);
+			  break;
+			default:
+			  alert("请输入正确的时间刻度！");
+			}
+		}
+    
+    //绘制时针间隔
+    context.save(); //存储当前画布坐标系状态
+    context.beginPath();
+    context.strokeStyle = "rgb(102,102,102)";
+    context.lineWidth = 3;
+    context.translate(250, 250); //将坐标系坐标原点移至图中间
+    for (i = 0; i < 60; i++) {
+        if (i % 5 == 0) {
+            context.beginPath();
+            context.moveTo(160, 0);
+            context.lineTo(174, 0);
+            context.stroke();
+        }
+        context.rotate(Math.PI / 6);
+    }
+    context.restore();
+    
+    //绘制分针间隔
+    context.save();
+    context.beginPath();
+    context.lineWidth = 5;
+    context.strokeStyle = "rgb(162,162,162)";
+    context.translate(250, 250); //将坐标系坐标原点移至图中间
+    for (i = 0; i < 60; i++) {
+        if (i % 5 != 0) {
+            context.beginPath();
+            context.moveTo(170, 0);
+            context.lineTo(174, 0);
+            context.stroke();
+        }
+        context.rotate(Math.PI / 30);
+    }
+    context.restore();
+    
+    //分别绘制时针、分针、秒针
+    
+    var now = new Date();
+    var sec = now.getSeconds();
+    var min = now.getMinutes();
+    var hr = now.getHours() >= 12 ? now.getHours() - 12 : now.getHours();
+    context.save();
+    context.translate(250, 250); //将坐标系坐标原点移至图中间
+    // - (Math.PI / 6) * 3 是因为0度在3点这里
+    context.rotate(hr * (Math.PI / 6) + (Math.PI / 360) * min + (Math.PI / 21600) * sec - (Math.PI / 6) * 3);
+    context.lineWidth = 10;
+    context.strokeStyle = "rgb(102,102,102)";
+    context.beginPath();
+    context.moveTo(0, 0);
+    context.lineTo(70, 0);
+    context.stroke();
+    context.restore();
+ 
+    context.save();
+    context.translate(255, 255); //将坐标系坐标原点移至图中间
+    context.rotate(sec * (Math.PI / 30) + (Math.PI / 1800) * sec - (Math.PI / 6) * 3)
+    context.lineWidth = 5;
+    context.strokeStyle = "rgb(222,104,87)";
+    context.beginPath();
+    context.moveTo(0, 0);
+    context.lineTo(120, 0);
+    context.stroke();
+    context.restore();
+ 
+    context.save();
+    context.translate(255, 255); //将坐标系坐标原点移至图中间
+    context.rotate(min * (Math.PI / 30) + (Math.PI / 1800) * sec - (Math.PI / 6) * 3)
+    context.lineWidth = 8;
+    context.strokeStyle = "rgb(102,102,102)";
+    context.beginPath();
+    context.moveTo(0, 0);
+    context.lineTo(100, 0);
+    context.stroke();
+    context.restore();
+ 
+    
+    //绘制中间的小圆点和圆圈
+    context.save();
+    context.beginPath();
+    context.fillStyle = "rgb(183,13,13)";
+    context.arc(250, 250, 6,  0, (Math.PI / 180) * 360, false);
+    context.fill();
+    context.restore();
+
+    context.save();
+    context.beginPath();
+    context.strokeStyle = "rgb(222,104,87)";
+    context.lineWidth = 4;
+    context.arc(250, 250, 9, 0, (Math.PI / 180) * 360, false);
+    context.stroke();
+    context.restore();
+}
+</script>
 </body>
 </html>
